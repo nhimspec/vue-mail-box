@@ -1,28 +1,40 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+    <div class="container">
+        <div class="mail-box">
+            <app-sidebar :messages="messages"></app-sidebar>
+            <app-content :messages="messages"></app-content>
+        </div>
+    </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SidebarVue from "./components/Sidebar.vue";
+import ContentVue from "./components/Content.vue";
+import messages from "./data/messages.js";
+import randomMessages from "./data/random-messages.js";
+import { eventBus } from "./main";
 
 export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
-}
-</script>
+    created() {
+        eventBus.$on("sendMessage", data => {
+            let temp = [data.message];
+            this.messages = temp.concat(this.messages.slice(0));
+        });
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+        eventBus.$on("refeshMessages", () => {
+            let randomIndex = Math.floor(Math.random() * randomMessages.length),
+                temp = [randomMessages[randomIndex]];
+            this.messages = temp.concat(this.messages.slice(0));
+        });
+    },
+    data() {
+        return {
+            messages
+        };
+    },
+    components: {
+        appSidebar: SidebarVue,
+        appContent: ContentVue
+    }
+};
+</script>
